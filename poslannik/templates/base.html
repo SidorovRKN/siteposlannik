@@ -1,0 +1,46 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <link type="text/css" href="{% static 'site_poslannik/css/styles.css' %}" rel="stylesheet" />
+</head>
+<body>
+
+    <div class="categories">
+        <ul>
+        {% for cat in cats %}
+            {% if cat.slug == cat_selected %}
+        <li><span class="selected">{{ cat.name }}</span></li>
+            {% else %}
+                <li><a href="{{ cat.get_absolute_url }}">{{ cat.name }}</a><li>
+            {% endif %}
+        {% endfor %}
+        </ul>
+    </div>
+        <div class="navigation">
+            <ul>
+                {% for i in mainmenu %}
+                    <li><p><a href="{% url i.url_name %}">{{i.title}}</a></p></li>
+                {%endfor%}
+                {% if user.is_anonymous %}
+                    <li><a href="{% url 'users:login' %}">Войти</a> | <a href="{% url 'users:register' %}">Регистрация</a></li>
+                         {% else %}
+                    <li>
+                        <form method="post" action="{% url 'users:logout' %}">
+                            {% csrf_token %}
+                            <button type="submit">Выйти из {{ user }}</button>
+                        </form>
+                    </li>
+                {% endif %}
+
+            </ul>
+        </div>
+    <div class="content">
+        {% block content %}
+        {% endblock %}
+    </div>
+</body>
+</html>

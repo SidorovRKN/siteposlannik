@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="title">
+        <h1>{{ title }}</h1>
+    </div>
+<ul>
+        {% for part in parts %}
+        <li>
+            <h1>{{part.name}}</h1>
+            <div class="product-details">
+                <div class="product-image">
+                    {% if part.photo %}
+                        <img src="{{part.photo.url}}" alt="{{ part.name }}" class="fixed-size-image">
+                    {% else %}
+                        <img src="/media/defaults/template_01.png" alt="{{ part.name }}" class="fixed-size-image">
+                    {% endif %}
+                </div>
+                <div class="product-description">
+                    <p>
+                        {# Костыль пока нет описания #}
+                        {% if part.descr %}
+                        {{part.descr}}
+                        {% else %}
+                        {{ default_descr }}
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            <p><a href="{{part.get_absolute_url}}">Заказать</a> </p>
+
+            {% if not forloop.last %}
+                <hr>
+            {% else %}
+                <form method="post" action="{% url 'cart:order' %}">
+                    {% csrf_token %}
+                    <button type="submit">Заказать всё</button>
+                </form>
+                <form method="post" action="{% url 'cart:flush_cart' %}">
+                    {% csrf_token %}
+                    <button type="submit">Очистить корзину</button>
+                </form>
+            {%endif%}
+        </li>
+    {% endfor %}
+    </ul>
+
+{% endblock %}

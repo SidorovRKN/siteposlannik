@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load poslannik_tags %}
+{% block content %}
+    <div class="title">
+        <h1>{{ part.name }}</h1>
+    </div>
+    <form class="search" action="{% url 'search' %}" method="GET">
+        <input type="text" name="q" placeholder="Поиск...">
+        <button type="submit">Найти</button>
+    </form>
+
+        <h1>{{part.name}}</h1>
+        <div class="product-details">
+            <div class="product-image">
+                {% if part.photo %}
+                    <img src="{{part.photo.url}}" alt="{{ part.name }}" class="fixed-size-image">
+                {% else %}
+                    <img src="/media/defaults/template_01.png" alt="{{ part.name }}" class="fixed-size-image">
+                {% endif %}
+            </div>
+            <div class="product-description">
+                <p>
+                    {# Костыль пока нет описания #}
+                    {% if part.descr %}
+                    {{part.descr}}
+                    {% else %}
+                    {{ default_descr }}
+                    {% endif %}
+                </p>
+                <p>{{ part.price|intpart }} руб. {{ part.price|decpart }} коп.</p>
+                <h2>Контакты для заказа</h2>
+
+                <p>{{ phone }}</p>
+                <p>{{ email }}</p>
+
+
+            </div>
+
+        </div>
+
+{% endblock %}

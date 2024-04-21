@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="title">
+        <h1>{{ title }}</h1>
+    </div>
+
+    <ul>
+        {% for order in orders %}
+        <li>
+            <h2>{{order.created_at}}</h2>
+            {% for part in order.items.all %}
+            <p>{{part.name}}</p>
+            {% endfor %}
+
+        </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

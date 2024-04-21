@@ -1,0 +1,134 @@
+/* Общие стили */
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+a {
+    text-decoration: none;
+    color: #007bff;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    color: #333;
+    font-size: 24px;
+    margin-top: 0;
+}
+
+/* Стили для блока навигации */
+
+
+
+/* Стили для блока категорий */
+
+.categories {
+    float: right;
+    width: 18%; /* Ширина блока категорий */
+    padding: 20px;
+}
+
+.categories li {
+    margin-bottom: 10px;
+}
+
+/* Стили для контента */
+
+.content {
+    margin-left: 20%; /* Учитываем ширину блока навигации */
+    margin-right: 30%; /* Учитываем ширину блока категорий */
+    padding: 20px;
+}
+
+/* Остальные стили, если необходимо */
+.title {
+    text-align: center; /* Выравниваем текст по центру */
+    margin-top: 50px; /* Устанавливаем верхний отступ, чтобы разместить заголовок выше */
+}
+
+.navigation {
+    width: 250px; /* Устанавливаем ширину блока навигации по вашему желанию */
+    margin-top: 20px;
+    margin-right: 20px; /* Добавляем правый отступ для разделения блока навигации от основного контента */
+    background-color: #f0f0f0; /* Добавляем фоновый цвет, чтобы выделить блок навигации */
+    padding: 10px; /* Добавляем внутренний отступ для улучшения внешнего вида */
+    float: left; /* Размещаем блок навигации слева */
+    border-radius: 5px; /* Добавляем скругление углов */
+}
+
+.search {
+    text-align: center; /* Выравниваем текст по центру */
+    margin-top: 50px; /* Устанавливаем верхний отступ, чтобы разместить заголовок выше */
+    margin-bottom: 100px
+}
+input[type="text"] {
+    width: 300px; /* Устанавливаем ширину поля для ввода по вашему желанию */
+    padding: 10px; /* Добавляем внутренний отступ, чтобы текст не прилипал к границам поля */
+    font-size: 16px; /* Устанавливаем размер шрифта */
+}
+
+.fixed-size-image {
+    width: 400px; /* Замените значение на нужное вам значение ширины */
+    height: 400px; /* Замените значение на нужное вам значение высоты */
+    object-fit: cover; /* Позволяет изображению сохранить пропорции и заполнить заданную область, обрезая лишнее */
+}
+
+.product-details {
+    display: flex; /* Используем flexbox для расположения элементов */
+    align-items: center; /* Выравниваем элементы по вертикали */
+}
+
+.product-image {
+    margin-right: 20px; /* Добавляем отступ справа от изображения */
+}
+
+.product-description {
+   align-self: flex-start; /* Выравниваем описание товара вверху контейнера */
+}
+.list-pages {
+	text-align: center;
+	margin: 0 0 20px 0;
+}
+.list-pages ul {
+	margin: 20px 0 0 0;
+	padding: 0;
+	list-style: none;
+}
+.list-pages ul li {
+	display: inline-block;
+	margin: 0 20px 0 0;
+}
+.list-pages a {
+	color: #000;
+	font-size: 24px;
+	text-decoration: none;
+}
+.list-pages .page-num, .page-num-selected {
+	display: inline-block;
+	width: 60px;
+	height: 44px;
+	padding: 16px 0 0 0;
+	border: 1px solid #d0d0d0;
+	border-radius: 30px;
+}
+.list-pages .page-num:hover {
+	box-shadow: 3px 3px 1px #d0d0d0;
+}
+.list-pages .page-num-selected {
+	border: none;
+	color: #000;
+	font-size: 20px;
+}
+.list-pages .page-num-selected:hover {
+	box-shadow: none;
+}}
