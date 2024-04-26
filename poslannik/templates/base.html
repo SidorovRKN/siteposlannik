@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <title>{{ title }}</title>
-    <link type="text/css" href="{% static 'site_poslannik/css/styles.css' %}" rel="stylesheet" />
+    <link type="text/css" href="{% static 'mainapp/css/styles.css' %}" rel="stylesheet" />
 </head>
 <body>
 
@@ -28,12 +28,14 @@
                 {% if user.is_anonymous %}
                     <li><a href="{% url 'users:login' %}">Войти</a> | <a href="{% url 'users:register' %}">Регистрация</a></li>
                          {% else %}
+                    <li class="last"><p><a href="{% url 'users:profile' %}">{{user.username}}</a></p></li>
                     <li>
                         <form method="post" action="{% url 'users:logout' %}">
                             {% csrf_token %}
                             <button type="submit">Выйти из {{ user }}</button>
                         </form>
                     </li>
+
                 {% endif %}
 
             </ul>

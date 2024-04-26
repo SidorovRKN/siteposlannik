@@ -1,22 +1,20 @@
-
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
-from django.views.generic import CreateView
+from django.views.generic import CreateView, UpdateView
 
-from users.forms import RegisterUserForm
+from cart.models import Order
+from users.forms import RegisterUserForm, ProfileUserForm
+from users.models import CustomUser
+
 
 # Create your views here.
-menu = [
-    {"title": "О нас", "url_name": "about"},
-    {"title": "Контакты", "url_name": "contact"},
-    {"title": "Войти", "url_name": "users:login"},
-]
 
-#
+
 # def register(request):
 #     if request.method == "POST":
 #         form = RegisterUserForm(request.POST)
@@ -42,16 +40,29 @@ class LoginUser(LoginView):
     template_name = 'users/login.html'
     extra_context = {'title': "Авторизация"}
 
-    # def get_success_url(self):
-    #     return reverse_lazy('about')
+    def get_success_url(self):
+        user = CustomUser.objects.get(username=self.request.POST['username'])
+        orphan_orders = Order.objects.filter(guest_phone=user.phone_number)
+        if orphan_orders.exists():
+            for order in orphan_orders:
+                order.user = user
+                order.save()
+        print(self.request.POST)
+        return reverse_lazy('home')
 
 
 class LogoutUser(LogoutView):
     next_page = 'home'
 
 
-def logout_user(request):
-    logout(request)
-    print(request.POST)
-    print(request.GET)
-    return HttpResponseRedirect(reverse('home'))
+class ProfileUser(LoginRequiredMixin, UpdateView):
+    model = get_user_model()
+    form_class = ProfileUserForm
+    template_name = 'users/profile.html'
+    extra_context = {'title': "Профиль пользователя"}
+
+    def get_success_url(self):
+        return reverse_lazy('users:profile')
+
+    def get_object(self, queryset=None):
+        return self.request.user

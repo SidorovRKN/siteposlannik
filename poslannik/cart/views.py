@@ -90,8 +90,7 @@ def create_order(request):
         if request.method == 'POST':
             form = GuestOrderForm(request.POST)
             if form.is_valid():
-                default_user = CustomUser.objects.get(username='default_user')
-                order = Order.objects.create(user=default_user, guest_name=form.cleaned_data['first_name'],
+                order = Order.objects.create(guest_name=form.cleaned_data['first_name'],
                                              guest_lastname=form.cleaned_data['last_name'],
                                              guest_phone=form.cleaned_data['phone'])
                 order.items.set(cart_items)
@@ -102,4 +101,4 @@ def create_order(request):
     else:
         order = Order.objects.create(user=user)
         order.items.set(cart_items)
-        return redirect('cart:flush_cart')  # Перенаправьте пользователя на страницу корзины или куда-либо еще
+        return redirect('cart:flush_cart')

@@ -33,6 +33,11 @@ INSTALLED_APPS = [
     "rest_framework"
 ]
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'users.authentication.EmailAuthBackend',
+]
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -73,8 +78,8 @@ WSGI_APPLICATION = 'poslannik.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'posl',
-        'USER': 'poslannik_root',
+        'NAME': 'POSLANNIK',
+        'USER': 'postgres',
         'PASSWORD': '1494933',
         'HOST': 'localhost',
         'PORT': '5432',

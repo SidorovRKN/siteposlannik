@@ -8,7 +8,7 @@ from users.models import CustomUser
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'created_at', 'display_items', 'usernames', 'phone', 'guest_name', 'guest_phone')
+    list_display = ('id', 'user', 'created_at', 'display_items', 'usernames', 'phone',)
     list_filter = ('user', 'created_at')
     list_display_links = ('user', 'id')
     readonly_fields = ['items']
@@ -20,11 +20,16 @@ class OrderAdmin(admin.ModelAdmin):
     display_items.short_description = 'Items'
 
     def usernames(self, obj):
-        return f"{obj.user.first_name} {obj.user.last_name}"
+        if obj.user:
+            return f"{obj.user.first_name} {obj.user.last_name}"
+        else:
+            return f"{obj.guest_name} {obj.guest_lastname}"
 
     def phone(self, obj):
-        return f"{obj.user.phone_number}"
-
+        if obj.user:
+            return f"{obj.user.phone_number}"
+        else:
+            return obj.guest_phone
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
         print(request.user)
