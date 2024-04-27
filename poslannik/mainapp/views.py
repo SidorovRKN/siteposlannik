@@ -14,7 +14,7 @@ from .utils import DataMixin
 class IndexView(DataMixin, ListView):
     template_name = 'mainapp/index.html'
     context_object_name = 'parts'
-    paginate_by = 20
+    paginate_by = 5
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

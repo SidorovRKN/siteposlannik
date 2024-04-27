@@ -1,14 +1,14 @@
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, UpdateView
 
 from cart.models import Order
-from users.forms import RegisterUserForm, ProfileUserForm
+from users.forms import RegisterUserForm, ProfileUserForm,UserPasswordChangeForm
 from users.models import CustomUser
 
 
@@ -40,14 +40,16 @@ class LoginUser(LoginView):
     template_name = 'users/login.html'
     extra_context = {'title': "Авторизация"}
 
-    def get_success_url(self):
+    def check_orphaned_orders(self):
         user = CustomUser.objects.get(username=self.request.POST['username'])
         orphan_orders = Order.objects.filter(guest_phone=user.phone_number)
         if orphan_orders.exists():
             for order in orphan_orders:
                 order.user = user
                 order.save()
-        print(self.request.POST)
+
+    def get_success_url(self):
+        self.check_orphaned_orders()
         return reverse_lazy('home')
 
 
@@ -66,3 +68,9 @@ class ProfileUser(LoginRequiredMixin, UpdateView):
 
     def get_object(self, queryset=None):
         return self.request.user
+
+class UserPasswordChange(PasswordChangeView):
+    form_class = UserPasswordChangeForm
+    success_url = reverse_lazy("users:password_change_done")
+    template_name = "users/password_change_form.html"
+    extra_context = {'title': "Изменение пароля"}

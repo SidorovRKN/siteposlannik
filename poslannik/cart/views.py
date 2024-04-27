@@ -20,17 +20,20 @@ def add_to_cart(request, product_id):
 
     # Проверяем, существует ли список в сессии, если нет, инициализируем его
     if 'cart' not in request.session:
-        request.session['cart'] = []
+        request.session['cart'] = {}
 
     # Добавляем товар в корзину
-    request.session['cart'].append(product.name)
+    if request.session['cart'].get(product.name, False):
+        request.session['cart'][product.name] += 1
+    else:
+        request.session['cart'].update({product.name: 1})
     request.session.modified = True
     return redirect('home')
 
 
 def flush_cart(request):
     if 'cart' in request.session:
-        request.session['cart'] = []
+        request.session['cart'] = {}
     return redirect('cart:view_cart')
 
 
@@ -38,10 +41,10 @@ def remove_from_cart(request, product_id):
     product = Parts.objects.get(pk=product_id)
 
     if 'cart' not in request.session:
-        request.session['cart'] = []
+        request.session['cart'] = {}
 
     else:
-        request.session['cart'].remove(product.name)
+        request.session['cart'].pop(product.name)
         request.session.modified = True
     return redirect('cart:view_cart')
 
@@ -56,11 +59,13 @@ class CartView(DataMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         cat_slug = self.kwargs.get('cat_slug')
+        cart = self.request.session.get('cart', {})
         return self.get_mixin_context(context, default_descr="Описание товара № ХХХХ", cat_selected=cat_slug,
-                                      title=self.title_page)
+                                      title=self.title_page, cart=cart)
 
     def get_queryset(self):
-        cart_product_names = self.request.session.get('cart', [])
+        cart_product_names = self.request.session.get('cart', {})
+        print(cart_product_names)
         parts = Parts.objects.filter(name__in=cart_product_names)
         return parts
 
@@ -85,7 +90,7 @@ class OrdersView(LoginRequiredMixin, DataMixin, ListView):
 
 def create_order(request):
     user = request.user
-    cart_items = Parts.objects.filter(name__in=request.session.get('cart', []))
+    cart_items = Parts.objects.filter(name__in=request.session.get('cart', {}))
     if user.is_anonymous:
         if request.method == 'POST':
             form = GuestOrderForm(request.POST)

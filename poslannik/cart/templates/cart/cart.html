@@ -17,12 +17,12 @@
                 </div>
                 <div class="product-description">
                     <p>
-                        {# Костыль пока нет описания #}
                         {% if part.descr %}
                         {{part.descr}}
                         {% else %}
                         {{ default_descr }}
                         {% endif %}
+                        {{ cart.part.name }}
                     </p>
                 </div>
             </div>
