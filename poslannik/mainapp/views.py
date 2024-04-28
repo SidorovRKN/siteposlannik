@@ -54,6 +54,7 @@ class AboutView(DataMixin, TemplateView):
         'cats': Category.objects.all(),
         'num': '76-36-02',
         'email': 'some_email@gmail.com',
+        'address': 'Борисов, улица Труда 7',
     }
 
 
