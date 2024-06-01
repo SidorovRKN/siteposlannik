@@ -28,10 +28,14 @@
                         {% else %}
                         {{ default_descr }}
                         {% endif %}
+                    {% if part.article %}
+                        <h2>Артикул: {{ part.article }}</h2>
+                    {%endif%}
+
                     </p>
                 </div>
             </div>
-            <p>{{ part.price|intpart }} руб. {{ part.price|decpart }} коп.</p>
+            <p>{{ part.price}} руб.</p>
             <p><a href="{{part.get_absolute_url}}">Заказать через оператора</a> </p>
             <form method="post" action="{% url 'cart:add_to_cart' product_id=part.id %}">
                 {% csrf_token %}

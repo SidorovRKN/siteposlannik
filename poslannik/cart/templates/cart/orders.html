@@ -9,7 +9,7 @@
         <li>
             <h2>{{order.created_at}}</h2>
             {% for part in order.items.all %}
-            <p>{{part.name}}</p>
+            <p>{{part.product.name}}</p>
             {% endfor %}
 
         </li>

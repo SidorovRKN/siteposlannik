@@ -3,53 +3,59 @@ from django.shortcuts import render
 # Create your views here.
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render
 from django.shortcuts import render, redirect
 from django.views.generic import ListView
 from mainapp.models import Parts
 from mainapp.utils import DataMixin
-from cart.models import Order
+from cart.models import Order, Cart, CartItem, OrderItem
 from cart.forms import GuestOrderForm
 
 from users.models import CustomUser
 
 
 # Create your views here.
+@login_required
 def add_to_cart(request, product_id):
     product = Parts.objects.get(pk=product_id)
-
-    # Проверяем, существует ли список в сессии, если нет, инициализируем его
-    if 'cart' not in request.session:
-        request.session['cart'] = {}
-
-    # Добавляем товар в корзину
-    if request.session['cart'].get(product.name, False):
-        request.session['cart'][product.name] += 1
+    user = request.user
+    user_cart, created = Cart.objects.get_or_create(user=user)
+    user_cart_items = CartItem.objects.filter(cart__user=user, product=product)
+    if user_cart_items.exists():
+        item = user_cart_items.first()
+        item.quantity += 1
+        item.save()
     else:
-        request.session['cart'].update({product.name: 1})
-    request.session.modified = True
+        cart, created = Cart.objects.get_or_create(user=user)
+        CartItem.objects.create(cart=cart, product=product)
     return redirect('home')
 
 
+@login_required
 def flush_cart(request):
-    if 'cart' in request.session:
-        request.session['cart'] = {}
+    user = request.user
+
+    cart_items = CartItem.objects.filter(cart__user=user)
+    if cart_items:
+        cart_items.delete()
+
     return redirect('cart:view_cart')
 
 
+@login_required
 def remove_from_cart(request, product_id):
     product = Parts.objects.get(pk=product_id)
+    user = request.user
+    cart, created = Cart.objects.get_or_create(user=user)
 
-    if 'cart' not in request.session:
-        request.session['cart'] = {}
+    if not created:
+        cart_item = CartItem.objects.get(cart=cart, product=product)
+        cart_item.quantity -= 1
+        cart_item.save()
 
-    else:
-        request.session['cart'].pop(product.name)
-        request.session.modified = True
     return redirect('cart:view_cart')
 
 
-class CartView(DataMixin, ListView):
+class CartView(LoginRequiredMixin, DataMixin, ListView):
     template_name = 'cart/cart.html'
     context_object_name = 'parts'
     paginate_by = 20
@@ -59,14 +65,15 @@ class CartView(DataMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         cat_slug = self.kwargs.get('cat_slug')
-        cart = self.request.session.get('cart', {})
+        user = self.request.user
+        cart = CartItem.objects.filter(cart__user=user)
         return self.get_mixin_context(context, default_descr="Описание товара № ХХХХ", cat_selected=cat_slug,
                                       title=self.title_page, cart=cart)
 
     def get_queryset(self):
-        cart_product_names = self.request.session.get('cart', {})
-        print(cart_product_names)
-        parts = Parts.objects.filter(name__in=cart_product_names)
+        user = self.request.user
+        parts = CartItem.objects.filter(cart__user=user)
+
         return parts
 
 
@@ -84,26 +91,16 @@ class OrdersView(LoginRequiredMixin, DataMixin, ListView):
                                       title=self.title_page)
 
     def get_queryset(self):
-        orders = Order.objects.filter(user=self.request.user)
-        return orders
+        order = Order.objects.filter(user=self.request.user)
+        return order
 
 
+@login_required
 def create_order(request):
     user = request.user
-    cart_items = Parts.objects.filter(name__in=request.session.get('cart', {}))
-    if user.is_anonymous:
-        if request.method == 'POST':
-            form = GuestOrderForm(request.POST)
-            if form.is_valid():
-                order = Order.objects.create(guest_name=form.cleaned_data['first_name'],
-                                             guest_lastname=form.cleaned_data['last_name'],
-                                             guest_phone=form.cleaned_data['phone'])
-                order.items.set(cart_items)
-                return redirect('cart:flush_cart')
-        else:
-            form = GuestOrderForm()
-        return render(request, 'cart/guest_order_form.html', {'form': form})
-    else:
-        order = Order.objects.create(user=user)
-        order.items.set(cart_items)
-        return redirect('cart:flush_cart')
+    order = Order.objects.create(user=user)
+    for obj in CartItem.objects.filter(cart__user=user):
+        OrderItem.objects.create(order=order, product=obj.product,
+                                 price=obj.product.price, quantity=obj.quantity)
+
+    return redirect('cart:flush_cart')

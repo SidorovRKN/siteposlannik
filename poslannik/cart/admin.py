@@ -8,13 +8,13 @@ from users.models import CustomUser
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'created_at', 'display_items', 'usernames', 'phone',)
+    list_display = ('id', 'user', 'created_at', 'display_items','confirmed', 'delivered', 'usernames', 'phone',)
     list_filter = ('user', 'created_at')
     list_display_links = ('user', 'id')
-    readonly_fields = ['items']
+    list_editable = ('confirmed', 'delivered')
 
     def display_items(self, obj):
-        parts = "\n".join([str(part) for part in obj.items.all()])
+        parts = "\n".join([str(part) + ' x' + str(part.quantity) for part in obj.items.all()])
         return mark_safe(format_html("<pre>{}</pre>", parts))
 
     display_items.short_description = 'Items'
@@ -30,6 +30,7 @@ class OrderAdmin(admin.ModelAdmin):
             return f"{obj.user.phone_number}"
         else:
             return obj.guest_phone
+
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
         print(request.user)

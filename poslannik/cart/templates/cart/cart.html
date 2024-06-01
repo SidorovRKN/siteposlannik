@@ -6,10 +6,10 @@
 <ul>
         {% for part in parts %}
         <li>
-            <h1>{{part.name}}</h1>
+            <h1>{{part.product.name}}</h1>
             <div class="product-details">
                 <div class="product-image">
-                    {% if part.photo %}
+                    {% if part.product.photo %}
                         <img src="{{part.photo.url}}" alt="{{ part.name }}" class="fixed-size-image">
                     {% else %}
                         <img src="/media/defaults/template_01.png" alt="{{ part.name }}" class="fixed-size-image">
@@ -17,12 +17,16 @@
                 </div>
                 <div class="product-description">
                     <p>
-                        {% if part.descr %}
-                        {{part.descr}}
+                        {% if part.product.descr %}
+                        {{part.product.descr}}
                         {% else %}
                         {{ default_descr }}
                         {% endif %}
-                        {{ cart.part.name }}
+                        {{ part.product.article }}
+                        <div>Количество: {{ part.quantity }}</div>
+                        <div>Цена: {{ part.product.price }} x {{ part.quantity }}</div>
+
+
                     </p>
                 </div>
             </div>

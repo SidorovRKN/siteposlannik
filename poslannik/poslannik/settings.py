@@ -78,7 +78,15 @@ WSGI_APPLICATION = 'poslannik.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'POSLANNIK',
+        'NAME': 'Poslannik',
+        'USER': 'poslannik_admin',
+        'PASSWORD': '1494933',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    },
+    'old_db': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'ParsedParts',
         'USER': 'postgres',
         'PASSWORD': '1494933',
         'HOST': 'localhost',

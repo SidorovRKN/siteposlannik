@@ -31,9 +31,13 @@ class DataMixin:
 
     def get_mixin_queryset(self, **kwargs):
         if kwargs.get('cat_slug'):
-            return Parts.objects.filter(category=Category.objects.get(slug=kwargs.get('cat_slug'))).order_by('name')
+            return Parts.objects.filter(category=Category.objects.get(slug=kwargs.get('cat_slug')), availability=True).order_by('name')
         elif kwargs.get('query_string'):
-            return Parts.objects.annotate(
-                search=SearchVector('name', 'descr', 'category')).filter(search=kwargs.get('query_string'))
+
+            result = (Parts.objects.annotate(
+                search=SearchVector('name', 'article', 'category'))
+                      .filter(search=kwargs.get('query_string'), availability=True))
+            return result
+
         else:
-            return Parts.objects.all().order_by('name')
+            return Parts.objects.filter(availability=True).order_by('name')
