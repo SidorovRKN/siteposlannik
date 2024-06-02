@@ -1,4 +1,6 @@
 from django.contrib.postgres.search import SearchVector
+from django.shortcuts import get_object_or_404
+
 from mainapp.models import Category, Parts
 
 menu = [
@@ -30,14 +32,14 @@ class DataMixin:
         return context
 
     def get_mixin_queryset(self, **kwargs):
-        if kwargs.get('cat_slug'):
-            return Parts.objects.filter(category=Category.objects.get(slug=kwargs.get('cat_slug')), availability=True).order_by('name')
-        elif kwargs.get('query_string'):
+        cat_slug = kwargs.get('cat_slug')
+        query_string = kwargs.get('query_string')
 
-            result = (Parts.objects.annotate(
-                search=SearchVector('name', 'article', 'category'))
-                      .filter(search=kwargs.get('query_string'), availability=True))
-            return result
-
+        if cat_slug:
+            category = get_object_or_404(Category, slug=cat_slug)
+            return Parts.objects.filter(category=category, availability=True).order_by('name')
+        elif query_string:
+            return Parts.objects.annotate(search=SearchVector('name', 'article', 'category')).filter(
+                search=query_string, availability=True)
         else:
             return Parts.objects.filter(availability=True).order_by('name')

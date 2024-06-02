@@ -4,13 +4,15 @@ from django.shortcuts import render
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from django.views.generic import ListView, DetailView, TemplateView
 from mainapp.models import Parts, Category
 from .utils import DataMixin
 
 
 # Create your views here.
-
+@method_decorator(cache_page(60 * 5), name='dispatch')
 class IndexView(DataMixin, ListView):
     template_name = 'mainapp/index.html'
     context_object_name = 'parts'
@@ -28,6 +30,7 @@ class IndexView(DataMixin, ListView):
         return parts
 
 
+@method_decorator(cache_page(60 * 5), name='dispatch')
 class ShowPartView(DataMixin, DetailView):
     model = Parts
     template_name = 'mainapp/part.html'
@@ -47,6 +50,7 @@ class ShowPartView(DataMixin, DetailView):
         return self.get_mixin_context(context, title=part.name, part=part, default_descr=f"Описание товара № {part.pk}")
 
 
+@method_decorator(cache_page(60 * 5), name='dispatch')
 class AboutView(DataMixin, TemplateView):
     template_name = "mainapp/about.html"
     title_page = 'О нас'
